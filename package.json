@@ -20,8 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "commit": "git-cz",
-    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
-    "log": "cp package.json _package.json &&preset=`conventional-commits-detector` && echo $preset && bump=`conventional-recommended-bump -p angular` && echo ${1:-$bump} && npm --no-git-tag-version version ${1:-$bump} &>/dev/null && conventional-changelog -i CHANGELOG.md -s -p ${2:-$preset} && git add CHANGELOG.md package.json package-lock.json && version=`cat package.json` && git commit -m'docs(CHANGELOG): $version' && mv -f _package.json package.json && npm version ${1:-$bump} -m 'chore(release): %s' && git push --follow-tags "
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md"
   },
   "dependencies": {
     "@nestjs/common": "^7.0.0",
@@ -43,6 +42,7 @@
     "@types/supertest": "^2.0.8",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
     "@typescript-eslint/parser": "^2.23.0",
+    "babel-eslint": "^10.1.0",
     "commitizen": "^4.1.2",
     "commitlint-config-cz": "^0.13.1",
     "conventional-changelog-cli": "^2.0.34",
@@ -51,10 +51,17 @@
     "cz-customizable": "^6.2.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
-    "eslint-plugin-import": "^2.20.1",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
     "husky": "^4.2.5",
     "jest": "^25.1.0",
+    "lint-staged": "^10.2.6",
     "prettier": "^1.19.1",
+    "snazzy": "^8.0.0",
+    "standard": "^14.3.4",
     "supertest": "^4.0.2",
     "ts-jest": "25.2.1",
     "ts-loader": "^6.2.1",
@@ -77,8 +84,16 @@
   },
   "husky": {
     "hooks": {
+      "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "globals": [
+      "使用全局变量下的属性不抛错比如",
+      "__TEST__"
+    ]
   },
   "jest": {
     "moduleFileExtensions": [
