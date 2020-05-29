@@ -23,6 +23,12 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    'no-useless-constructor': 0
+    'no-useless-constructor': 0,
+    'no-unused-vars': 0,
+    'standard/no-unused-vars': 0,
+    '@typescript-eslint/no-unused-vars': 0,
+    'camelcase': 0,
+    'standard/camelcase': 0,
+    '@typescript-eslint/camelcase': 0
   }
 };

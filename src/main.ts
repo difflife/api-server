@@ -1,8 +1,24 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { NestFactory } from '@nestjs/core'
+import { ConfigService } from '@nestjs/config'
+import { AppModule } from './app.module'
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+import setupApp from './core/setup'
+
+async function bootstrap () {
+  const app = await NestFactory.create(AppModule)
+  const configService = app.get(ConfigService)
+
+  // 初始化nest
+  app.init()
+
+  // 建立app配置
+  setupApp(app)
+
+  // 启动服务
+  await app.listen(
+    configService.get<number>('environment.port'),
+    configService.get<string>('environment.host')
+  )
 }
-bootstrap();
+
+bootstrap().catch(console.error)
