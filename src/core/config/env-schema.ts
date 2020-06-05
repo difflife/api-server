@@ -32,10 +32,18 @@ export default Joi.object({
   REDIS_PORT: number.default(6379),
   REDIS_PASSWORD: string.empty('').default(''),
   REDIS_DB: number.default(0),
-  // mongodb配置验证
-  MONGO_HOST: string.hostname().default('localhost'),
-  MONGO_PORT: number.default(27017),
-  MONGO_USER: string.empty('').default(''),
-  MONGO_PASS: string.empty('').default(''),
-  MONGO_DBS: string.empty('').default('')
+  // // mongodb配置验证
+  // MONGO_HOST: string.hostname().default('127.0.0.1'),
+  // MONGO_PORT: number.default(27017),
+  // MONGO_USER: string.empty('').default(''),
+  // MONGO_PASS: string.empty('').default(''),
+  // MONGO_DBS: string.empty('').default('')
+  // mysql配置验证
+  BATABASE_MYSQL: string.hostname().default('mysql'),
+  MYSQL_HOST: string.hostname().default('127.0.0.1'),
+  MYSQL_PORT: number.default(3306),
+  MYSQL_USERNAME: string.empty('').default(''),
+  MYSQL_PASSWORD: string.empty('').default(''),
+  MYSQL_DATABASE: string.empty('').default(''),
+  MYSQL_ENTITIES: string.empty('').default('')
 })
