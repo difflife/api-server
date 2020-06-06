@@ -21,7 +21,7 @@ import { ModelsModule } from '../models/models.module'
       useFactory: (configService: ConfigService) => {
         return {
           ...configService.get('database'),
-          entities: [join(process.cwd(), '**/*.entity{.ts,.js}')], // 路径临时写的，需要根据实际进行修改
+          entities: [join(process.cwd(), 'dist', '**/*.entity{.ts,.js}')], // 路径临时写的，需要根据实际进行修改
           synchronize: true,
           retryAttempts: 1, // 重试连接数据库的次数（默认：10）
           retryDelay: 3000, // 两次重试连接的间隔(ms)（默认：3000）
