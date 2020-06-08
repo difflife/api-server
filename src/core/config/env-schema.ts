@@ -45,5 +45,7 @@ export default Joi.object({
   MYSQL_USERNAME: string.empty('').default(''),
   MYSQL_PASSWORD: string.empty('').default(''),
   MYSQL_DATABASE: string.empty('').default(''),
-  MYSQL_ENTITIES: string.empty('').default('')
+  MYSQL_ENTITIES: string.empty('').default(''),
+  // graphql
+  GRAPHQL_TYPEPATHS: string.empty('')
 })
