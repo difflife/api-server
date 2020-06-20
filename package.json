@@ -1,5 +1,5 @@
 {
-  "name": "difflife",
+  "name": "backend",
   "version": "0.0.2",
   "description": "",
   "author": "",
@@ -11,7 +11,9 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env NODE_ENV=development nest start",
     "start:dev": "cross-env NODE_ENV=development nest start --watch",
+    "start:dev:hot": "cross-env NODE_ENV=development webpack --config webpack.config.js --watch",
     "dev": "concurrently -n w:typings,w:start:dev \"npm run typings\" \"npm run start:dev\"",
+    "dev:hot": "concurrently -n w:typings,w:start:dev:hot \"npm run typings\" \"npm run start:dev:hot\"",
     "start:debug": "cross-env NODE_ENV=debug nest start --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -47,6 +49,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
+    "start-server-webpack-plugin": "^2.2.5",
     "typeorm": "^0.2.25"
   },
   "devDependencies": {
@@ -84,10 +87,13 @@
     "standard": "^14.3.4",
     "supertest": "^4.0.2",
     "ts-jest": "25.2.1",
-    "ts-loader": "^6.2.1",
+    "ts-loader": "^7.0.5",
     "ts-node": "^8.6.2",
     "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.4",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-node-externals": "^1.7.2"
   },
   "config": {
     "commitizen": {
