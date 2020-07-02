@@ -67,6 +67,9 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
+
+# introspect 根据数据库生产prisma数据模型，详情请读阅 prisma.md
+$ npm run introspect
 ```
 
 ## Test

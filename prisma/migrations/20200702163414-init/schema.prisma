@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url = "***"
+}
+
+
+model User {
+  id        String              @id @default(cuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  name      String?
+  accounts  Account[]
+  email     String?     @unique
+  password  String?
+  // roles     UserRole[]
+  roles     String
+}
+
+model Account {
+  id            String              @id @default(cuid())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  name          String
+  currency      Currency      @default(USD)
+  balance       Float         @default(0)
+  user          User          @relation(fields:[userId])
+  userId        String
+  transactions  Transaction[]
+}
+
+model Transaction {
+  id        String              @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  amount    Float
+  account   Account  @relation(fields: [accountId])
+  accountId String
+}
+
+// enum UserRole {
+//   ADMIN
+//   EMPLOYEE
+// }
+
+enum Currency {
+  USD
+  EUR
+  RUB
+}
