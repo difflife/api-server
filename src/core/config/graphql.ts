@@ -9,5 +9,4 @@ export default registerAs('graphql', (): GraphqlConfig => {
   return {
     typePaths: JSON.parse(typePaths)
   }
-}
-)
+})

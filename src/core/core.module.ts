@@ -7,7 +7,7 @@ import { join } from 'path'
 import loadConfig from './config/load-config'
 import validationSchema from './config/env-schema'
 import { ModelsModule } from '../models/models.module'
-import { User } from '../models/users/user.entity'
+// import { User } from '../models/users/user.entity'
 
 @Module({
   imports: [
@@ -22,8 +22,8 @@ import { User } from '../models/users/user.entity'
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         ...configService.get('database'),
-        // entities: [join(process.cwd(), 'dist', '**/*.entity{.ts,.js}')],
-        entities: [User],
+        entities: [join(process.cwd(), 'dist', '**/*.entity{.ts,.js}')],
+        // entities: [User], // 使用webpack热更新时需要引入每个entity，对应script命令dev:hot
         synchronize: true,
         retryAttempts: 1, // 重试连接数据库的次数（默认：10）
         retryDelay: 3000, // 两次重试连接的间隔(ms)（默认：3000）
@@ -40,4 +40,5 @@ import { User } from '../models/users/user.entity'
     ModelsModule
   ]
 })
+
 export class CoreModule {}

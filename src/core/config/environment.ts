@@ -23,5 +23,4 @@ export default registerAs('environment', (): EnvironmentConfig => {
     isProduction: environment === 'production',
     isTest: environment === 'test'
   }
-}
-)
+})

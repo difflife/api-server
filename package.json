@@ -48,7 +48,6 @@
     "mysql": "^2.18.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^6.5.4",
     "start-server-webpack-plugin": "^2.2.5",
     "typeorm": "^0.2.25"
   },
