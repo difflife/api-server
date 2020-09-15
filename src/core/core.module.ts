@@ -6,7 +6,6 @@ import { join } from 'path'
 
 import loadConfig from './config/load-config'
 import validationSchema from './config/env-schema'
-import { ModelsModule } from '../models/models.module'
 // import { User } from '../models/users/user.entity'
 
 @Module({
@@ -36,8 +35,7 @@ import { ModelsModule } from '../models/models.module'
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => configService.get('graphql'),
       inject: [ConfigService]
-    }),
-    ModelsModule
+    })
   ]
 })
 
