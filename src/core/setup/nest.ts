@@ -1,5 +1,5 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common'
-// import { HttpExceptionFilter } from '../filters/http-exception.filter';
+import { HttpExceptionFilter } from '../filters'
 
 export default (app: INestApplication) => {
   // 注册并配置全局验证管道
@@ -16,6 +16,10 @@ export default (app: INestApplication) => {
   //   })
   // )
 
-  // 注册全局http异常过滤器
-  // app.useGlobalFilters(new HttpExceptionFilter());
+  /**
+   * 注册全局http异常过滤器
+   * 非全局范围注册过滤器，应尽可能使用类而不是实例来应用过滤器。
+   * 由于Nest可以轻松在整个模块中重复使用同一类的实例，因此可以减少内存使用。
+   *  */
+  app.useGlobalFilters(new HttpExceptionFilter())
 }

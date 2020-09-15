@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, HttpException, HttpStatus } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { User } from './user.entity'
 import { UsersService } from './users.service'
@@ -14,7 +14,8 @@ export class UsersController {
 
   @Get()
   findAll (): Promise<User[]> {
-    return this.usersService.findAll()
+    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN)
+    // return this.usersService.findAll()
   }
 
   @Get(':id')
