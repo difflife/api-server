@@ -13,7 +13,11 @@ import { ModelsModule } from './models/models.module'
   controllers: [AppController],
   providers: [
     AppService
-    // { // 通过此方法设置全局管道可注入依赖关系，使用其他自定义providers也有相同作用
+    /**
+     * 通过此方法设置全局管道可注入依赖关系，使用其他自定义providers也有相同作用
+     * 守卫、拦截器、过滤器都可以通过这种方法全局注册
+     */
+    // {
     //   provide: APP_PIPE,
     //   useClass: ValidationPipe
     // }

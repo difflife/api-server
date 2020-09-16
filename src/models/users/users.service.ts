@@ -19,7 +19,7 @@ export class UsersService {
     return this.usersRepository.save(user)
   }
 
-  async findAll (): Promise<User[]> {
+  findAll (): Promise<User[]> {
     return this.usersRepository.find()
   }
 
@@ -27,7 +27,7 @@ export class UsersService {
     return this.usersRepository.findOne(id)
   }
 
-  async remove (id: string): Promise<void> {
-    await this.usersRepository.delete(id)
+  remove (id: string): Promise<any> {
+    return this.usersRepository.delete(id)
   }
 }
