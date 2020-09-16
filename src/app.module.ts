@@ -1,4 +1,5 @@
-import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
+import { Module, MiddlewareConsumer, RequestMethod, ValidationPipe } from '@nestjs/common'
+import { APP_PIPE } from '@nestjs/core'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { CoreModule, LoggerMiddleware } from './core'
@@ -10,7 +11,13 @@ import { ModelsModule } from './models/models.module'
     ModelsModule
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [
+    AppService
+    // { // 通过此方法设置全局管道可注入依赖关系，使用其他自定义providers也有相同作用
+    //   provide: APP_PIPE,
+    //   useClass: ValidationPipe
+    // }
+  ]
 })
 
 export class AppModule {

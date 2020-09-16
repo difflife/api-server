@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, HttpException, HttpStatus } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, HttpException, HttpStatus, ParseIntPipe } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { User } from './user.entity'
 import { UsersService } from './users.service'
@@ -18,8 +18,14 @@ export class UsersController {
     // return this.usersService.findAll()
   }
 
+  /**
+   * 如果需要自定义内部管道行为，则需要实例化
+   */
   @Get(':id')
-  findOne (@Param('id') id: string): Promise<User> {
+  findOne (
+    // @Param('id', ParseIntPipe) id: string
+    @Param('id', new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE })) id: string
+  ): Promise<User> {
     return this.usersService.findOne(id)
   }
 

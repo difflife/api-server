@@ -1,20 +1,31 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common'
+import { INestApplication, ValidationPipe, ValidationError, BadRequestException } from '@nestjs/common'
 import { HttpExceptionFilter } from '../filters'
 
 export default (app: INestApplication) => {
-  // 注册并配置全局验证管道
-  // 注册全局管道之后post和put请求会报错，暂无解决方法
-  // No metadata found. There is more than once class-validator version installed probably. You need to flatten your dependencies
-
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     transform: true,
-  //     whitelist: true,
-  //     forbidNonWhitelisted: true,
-  //     skipMissingProperties: false,
-  //     forbidUnknownValues: true
-  //   })
-  // )
+  // // 注册并配置全局验证管道
+  app.useGlobalPipes(
+    new ValidationPipe({ // 也可以在 module 中使用自定义自定义 providers 进行全局注册
+      transform: true,
+      disableErrorMessages: true, // 禁用详细错误
+      exceptionFactory: (errors: ValidationError[]) => { // 接受一个验证错误数组并返回一个要抛出的异常对象
+        const messageArray = []
+        errors.forEach((item) => {
+          messageArray.push(Object.values(item.constraints))
+        })
+        const message = messageArray.join('; ')
+        return new BadRequestException(message)
+      },
+      whitelist: true, // 如果设置为true，验证器将去掉没有使用任何验证装饰器的属性的验证（返回的）对象
+      forbidNonWhitelisted: true, // 如果设置为true，验证器不会去掉非白名单的属性，而是会抛出异常
+      skipMissingProperties: false, // 如果设置为true，验证将跳过对所有验证对象中没有的属性的验证
+      forbidUnknownValues: true, // 如果设置为true，尝试验证未知对象会立即失败
+      dismissDefaultMessages: false, // 如果设置为true，将不会使用默认消息验证，如果不设置，错误消息会始终是undefined
+      validationError: {
+        target: true, // 确定目标是否要在ValidationError中暴露出来
+        value: true // 确定验证值是否要在ValidationError中暴露出来
+      }
+    })
+  )
 
   /**
    * 注册全局http异常过滤器
