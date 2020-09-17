@@ -8,15 +8,17 @@ import { catchError } from 'rxjs/operators'
  * 异常拦截器
  * 利用 catchError() 操作符来覆盖抛出的异常
  */
-/* eslint-disable */
 @Injectable()
 export class ErrorsInterceptor implements NestInterceptor {
   intercept (context: ExecutionContext, next: CallHandler): Observable<any> {
     return next
       .handle()
       .pipe(
-        catchError(err => throwError(new BadGatewayException()))
+        catchError(err => {
+          console.log('error interceptor:', err)
+          return throwError(new BadGatewayException(err))
+        })
+        // catchError(err => throwError(new BadGatewayException()))
       )
   }
 }
-/* eslint-disable */

@@ -16,7 +16,10 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
     return next
       .handle()
       .pipe(
-        map(data => ({ data }))
+        map(data => {
+          console.log('response interceptor:', data)
+          return { data }
+        })
       )
   }
 }
