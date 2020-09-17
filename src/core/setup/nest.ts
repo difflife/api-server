@@ -1,5 +1,6 @@
 import { INestApplication, ValidationPipe, ValidationError, BadRequestException } from '@nestjs/common'
 import { HttpExceptionFilter } from '../filters'
+import { LoggingInterceptor, TransformInterceptor, TimeoutInterceptor, ErrorsInterceptor } from '../interceptors'
 
 export default (app: INestApplication) => {
   // // 注册并配置全局验证管道
@@ -33,4 +34,9 @@ export default (app: INestApplication) => {
    * 由于Nest可以轻松在整个模块中重复使用同一类的实例，因此可以减少内存使用。
    *  */
   app.useGlobalFilters(new HttpExceptionFilter())
+
+  app.useGlobalInterceptors(new LoggingInterceptor())
+  app.useGlobalInterceptors(new TimeoutInterceptor())
+  // app.useGlobalInterceptors(new TransformInterceptor())
+  app.useGlobalInterceptors(new ErrorsInterceptor())
 }
