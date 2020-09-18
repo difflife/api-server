@@ -21,6 +21,16 @@ import { ModelsModule } from './models/models.module'
     //   provide: APP_PIPE,
     //   useClass: ValidationPipe
     // }
+    /**
+     * 异步注入provider
+     */
+    // {
+    //   provide: 'ASYNC_CONNECTION',
+    //   useFactory: async () => {
+    //     const connection = await createConnection(options);
+    //     return connection;
+    //   },
+    // }
   ]
 })
 
