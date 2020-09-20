@@ -3,6 +3,9 @@ import { HttpExceptionFilter } from '../filters'
 import { LoggingInterceptor, TransformInterceptor, TimeoutInterceptor, ErrorsInterceptor } from '../interceptors'
 
 export default (app: INestApplication) => {
+  // 设置前缀，对graphql请求不起作用
+  // app.setGlobalPrefix('api')
+
   // // 注册并配置全局验证管道
   app.useGlobalPipes(
     new ValidationPipe({ // 也可以在 module 中使用自定义自定义 providers 进行全局注册
@@ -34,9 +37,8 @@ export default (app: INestApplication) => {
    * 由于Nest可以轻松在整个模块中重复使用同一类的实例，因此可以减少内存使用。
    *  */
   app.useGlobalFilters(new HttpExceptionFilter())
-
   app.useGlobalInterceptors(new LoggingInterceptor())
   app.useGlobalInterceptors(new TimeoutInterceptor())
-  // app.useGlobalInterceptors(new TransformInterceptor())
+  app.useGlobalInterceptors(new TransformInterceptor())
   app.useGlobalInterceptors(new ErrorsInterceptor())
 }
