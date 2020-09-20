@@ -13,8 +13,9 @@ export class UsersService {
 
   create (createUserDto: CreateUserDto): Promise<User> {
     const user = new User()
-    user.firstName = createUserDto.firstName
-    user.lastName = createUserDto.lastName
+    for (const key in createUserDto) {
+      user[key] = createUserDto[key]
+    }
 
     return this.usersRepository.save(user)
   }
@@ -23,8 +24,12 @@ export class UsersService {
     return this.usersRepository.find()
   }
 
-  findOne (id: string): Promise<User> {
+  findOneById (id: string): Promise<User> {
     return this.usersRepository.findOne(id)
+  }
+
+  findOne (username: string): Promise<User> {
+    return this.usersRepository.findOne({ username })
   }
 
   remove (id: string): Promise<any> {
