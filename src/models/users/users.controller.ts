@@ -32,6 +32,10 @@ export class UsersController {
     return this.usersService.findOne(id)
   }
 
+  /**
+ *  @Roles('admin')该装饰器尚未测试通过，当前并没有设置角色但依然可以删除成功
+ */
+
   @Delete(':id')
   // @SetMetadata('roles', ['admin'])
   @Roles('admin')

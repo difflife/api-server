@@ -5,22 +5,25 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AuthService } from './auth.service'
 import { UsersModule } from '../users/users.module'
 import { LocalStrategy } from './local.strategy'
+import { JwtStrategy } from './jwt.strategy'
 import { AuthController } from './auth.controller'
 
 @Module({
   imports: [
+    PassportModule.register({
+      defaultStrategy: 'jwt' // 设置默认策略，则在调用AuthGuard时可以不传参数，默认使用jwt策略
+    }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         ...configService.get('jwt'),
-        signOptions: { expiresIn: '60s' }
+        expiresIn: '60s'
       }),
       inject: [ConfigService]
     }),
-    PassportModule,
     UsersModule
   ],
-  providers: [AuthService, LocalStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController]
 })
 export class AuthModule {}

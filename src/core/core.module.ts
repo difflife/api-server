@@ -11,14 +11,14 @@ import validationSchema from './config/env-schema'
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // 设置为全局之后在其他module中可以不用imports: [ConfigModule]直接使用
       expandVariables: true,
       envFilePath: join(process.cwd(), 'config', `${process.env.NODE_ENV || 'development'}.env`),
       load: loadConfig,
       validationSchema
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
+      // imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         ...configService.get('database'),
         entities: [join(process.cwd(), 'dist', '**/*.entity{.ts,.js}')],
@@ -32,8 +32,11 @@ import validationSchema from './config/env-schema'
       inject: [ConfigService]
     }),
     GraphQLModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => configService.get('graphql'),
+      // imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        ...configService.get('graphql'),
+        context: ({ req }) => ({ req })
+      }),
       inject: [ConfigService]
     })
   ]
