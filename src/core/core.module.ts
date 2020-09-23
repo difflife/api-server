@@ -35,7 +35,8 @@ import validationSchema from './config/env-schema'
       // imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         ...configService.get('graphql'),
-        context: ({ req }) => ({ req })
+        context: ({ req, res }) => ({ req, res }),
+        playground: process.env.NODE_ENV !== 'production'
       }),
       inject: [ConfigService]
     })

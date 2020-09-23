@@ -36,8 +36,8 @@ export default (app: INestApplication) => {
    * 非全局范围注册过滤器，应尽可能使用类而不是实例来应用过滤器。
    * 由于Nest可以轻松在整个模块中重复使用同一类的实例，因此可以减少内存使用。
    *  */
-  app.useGlobalFilters(new HttpExceptionFilter())
-  app.useGlobalInterceptors(new LoggingInterceptor())
+  // app.useGlobalFilters(new HttpExceptionFilter()) // 拦截 grqphql 请求时会出现问题，暂先注释
+  // app.useGlobalInterceptors(new LoggingInterceptor())
   app.useGlobalInterceptors(new TimeoutInterceptor())
   app.useGlobalInterceptors(new TransformInterceptor())
   app.useGlobalInterceptors(new ErrorsInterceptor())

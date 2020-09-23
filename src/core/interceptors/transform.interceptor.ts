@@ -34,7 +34,8 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
           //   // do something that is only important in the context of websocket requests
           // }
 
-          if (context.getType<GqlContextType>() === 'graphql' || context.getType() === 'http') {
+          // context.getType<GqlContextType>() === 'graphql' ||
+          if (context.getType() === 'http') {
             return {
               data: data || {},
               code: 0
