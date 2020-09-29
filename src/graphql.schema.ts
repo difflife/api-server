@@ -12,9 +12,15 @@ export class CreateCatInput {
 }
 
 export abstract class IQuery {
+    abstract login(account?: string, password?: string): Login | Promise<Login>;
+
     abstract getCats(): Cat[] | Promise<Cat[]>;
 
     abstract cat(id: string): Cat | Promise<Cat>;
+}
+
+export class Login {
+    token?: string;
 }
 
 export abstract class IMutation {

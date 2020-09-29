@@ -1,6 +1,11 @@
 import { Controller, Request, Get, Post, UseGuards } from '@nestjs/common'
-import { LocalAuthGuard, RestAuthGuard } from '../../core'
+import { LocalAuthGuard, AuthRestGuard, UserRest } from '../../core'
 import { AuthService } from './auth.service'
+
+interface User {
+  password: string,
+  account: string,
+}
 
 @Controller()
 export class AuthController {
@@ -8,11 +13,11 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login (@Request() req) {
-    return this.authService.issueToken(req.user)
+  async login (@UserRest() user: User) {
+    return this.authService.issueToken(user)
   }
 
-  @UseGuards(RestAuthGuard)
+  @UseGuards(AuthRestGuard)
   @Get('user')
   getUsreInfo (@Request() req) {
     return req.user

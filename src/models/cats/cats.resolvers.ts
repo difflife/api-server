@@ -3,8 +3,8 @@ import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
 import { PubSub } from 'graphql-subscriptions'
 import { Cat } from '../../graphql.schema'
 import { CatsService } from './cats.service'
-import { CreateCatDto } from './dto/create-cat.dto'
-import { GqlAuthGuard } from '../../core/guards'
+import { CreateCatDto } from './dto/create.cat.dto'
+import { AuthGqlGuard } from '../../core/guards'
 
 const pubSub = new PubSub()
 
@@ -13,15 +13,14 @@ export class CatsResolvers {
   constructor (private readonly catsService: CatsService) {}
 
   @Query()
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(AuthGqlGuard)
   async getCats () {
     return this.catsService.findAll()
   }
 
   @Query('cat')
   async findOneById (
-    @Args('id', ParseIntPipe)
-      id: number
+    @Args('id', ParseIntPipe) id: number
   ): Promise<Cat> {
     return this.catsService.findOneById(id)
   }

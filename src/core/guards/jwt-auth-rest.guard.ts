@@ -4,7 +4,7 @@ import {
 import { AuthGuard } from '@nestjs/passport'
 
 @Injectable()
-export class RestAuthGuard extends AuthGuard('jwt') {
+export class AuthRestGuard extends AuthGuard('jwt') {
   canActivate (context: ExecutionContext) {
     // Add your custom authentication logic here
     // for example, call super.logIn(request) to establish a session.

@@ -28,8 +28,8 @@ export class UsersService {
     return this.usersRepository.findOne(id)
   }
 
-  findOne (username: string): Promise<User> {
-    return this.usersRepository.findOne({ username })
+  findOne (account: string): Promise<User> {
+    return this.usersRepository.findOne({ account })
   }
 
   remove (id: string): Promise<any> {

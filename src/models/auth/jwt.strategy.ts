@@ -19,6 +19,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate (payload: any) {
     // 此处可以查询数据库返回更多的用户信息
-    return { id: payload.sub, username: payload.username }
+    return { id: payload.sub, account: payload.account }
   }
 }

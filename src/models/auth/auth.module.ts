@@ -7,6 +7,7 @@ import { UsersModule } from '../users/users.module'
 import { LocalStrategy } from './local.strategy'
 import { JwtStrategy } from './jwt.strategy'
 import { AuthController } from './auth.controller'
+import { AuthResolvers } from './auth.resolvers'
 
 @Module({
   imports: [
@@ -17,13 +18,15 @@ import { AuthController } from './auth.controller'
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         ...configService.get('jwt'),
-        expiresIn: '60s'
+        signOptions: {
+          expiresIn: 3600 // 1hr
+        }
       }),
       inject: [ConfigService]
     }),
     UsersModule
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, AuthResolvers],
   controllers: [AuthController]
 })
 export class AuthModule {}
