@@ -3,7 +3,7 @@ import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
 import { PubSub } from 'graphql-subscriptions'
 import { Cat } from '../../graphql.schema'
 import { CatsService } from './cats.service'
-import { CreateCatDto } from './dto/create.cat.dto'
+import { CreateCatDto } from './dto/create-cat.dto'
 import { AuthGqlGuard } from '../../core/guards'
 
 const pubSub = new PubSub()

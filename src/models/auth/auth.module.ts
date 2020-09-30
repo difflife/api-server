@@ -19,7 +19,7 @@ import { AuthResolvers } from './auth.resolvers'
       useFactory: async (configService: ConfigService) => ({
         ...configService.get('jwt'),
         signOptions: {
-          expiresIn: 3600 // 1hr
+          expiresIn: '7d'
         }
       }),
       inject: [ConfigService]

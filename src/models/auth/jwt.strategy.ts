@@ -1,7 +1,7 @@
+import { Injectable } from '@nestjs/common'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
 import { ConfigService } from '@nestjs/config'
-import { Injectable } from '@nestjs/common'
 
 /**
  * PassportStrategy(Strategy, myjwt)可以添加第二参，在使用时通过@UseGuards(AuthGuard('myjwt'))调用
@@ -11,7 +11,13 @@ import { Injectable } from '@nestjs/common'
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor (private configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Authorization Bearer 验证模式
+      // jwtFromRequest: ExtractJwt.fromHeader('token'), // API key 验证模式
+      jwtFromRequest: ExtractJwt.fromExtractors([ // 设置多种验证模式
+        ExtractJwt.fromHeader('token'), // API key 验证模式
+        ExtractJwt.fromUrlQueryParameter('token'), // url 传递token验证
+        ExtractJwt.fromAuthHeaderAsBearerToken() // Authorization Bearer 验证模式
+      ]),
       ignoreExpiration: false,
       secretOrKey: configService.get('jwt').secret
     })
