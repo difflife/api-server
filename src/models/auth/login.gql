@@ -1,0 +1,30 @@
+type Query {
+  "登录"
+  login(loginInput: LoginInput): Login
+  "通过refresh_token换取access_token"
+  accessToken(refreshToken: String): Login
+  "退出登录"
+  logout(refreshToken: String): String
+  "退出全部设备"
+  logoutFromAll: String
+}
+
+"登录输入参数"
+input LoginInput {
+  "账号"
+  account: String!
+  "密码"
+  password: String!
+  "国家"
+  countryCode: String
+}
+
+"登录返回参数"
+type Login {
+  "令牌"
+  token: String
+  "当token过期时通过refreshToken换取新的token"
+  refreshToken: String
+  "过期时间"
+  expiresIn: Int
+}

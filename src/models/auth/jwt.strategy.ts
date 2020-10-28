@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
 import { ConfigService } from '@nestjs/config'
+import { JwtPayload } from './interfaces/jwt-payload'
+import { TokenService } from './token.service'
 
 /**
  * PassportStrategy(Strategy, myjwt)可以添加第二参，在使用时通过@UseGuards(AuthGuard('myjwt'))调用
@@ -9,10 +11,10 @@ import { ConfigService } from '@nestjs/config'
  */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor (private configService: ConfigService) {
+  constructor (
+    private readonly tokenService: TokenService,
+    private configService: ConfigService) {
     super({
-      // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Authorization Bearer 验证模式
-      // jwtFromRequest: ExtractJwt.fromHeader('token'), // API key 验证模式
       jwtFromRequest: ExtractJwt.fromExtractors([ // 设置多种验证模式
         ExtractJwt.fromHeader('token'), // API key 验证模式
         ExtractJwt.fromUrlQueryParameter('token'), // url 传递token验证
@@ -23,8 +25,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  async validate (payload: any) {
+  async validate (payload: JwtPayload) {
     // 此处可以查询数据库返回更多的用户信息
-    return { id: payload.sub, account: payload.account }
+    const result = await this.tokenService.validatePayload(payload)
+    if (!result) {
+      throw new UnauthorizedException()
+    }
+    return result
   }
 }

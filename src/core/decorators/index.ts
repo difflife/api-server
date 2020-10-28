@@ -1,3 +1,5 @@
 export * from './roles.decorator'
-export * from './user-gql.decorator'
-export * from './user-rest.decorator'
+export * from './user.decorator'
+export * from './ip.decorator'
+export * from './request.decorator'
+export * from './token.decorator'

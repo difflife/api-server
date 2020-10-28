@@ -1,20 +1,23 @@
-import { Controller, Request, Get, Post, UseGuards } from '@nestjs/common'
-import { LocalAuthRestGuard, AuthRestGuard, UserRest } from '../../core'
+import { Controller, Request, Get, Post, UseGuards, Body, UnauthorizedException } from '@nestjs/common'
+import { AuthRestGuard, Ip } from '../../core'
 import { AuthService } from './auth.service'
-
-interface User {
-  password: string,
-  account: string,
-}
+import { LoginDto } from './dto/login.dto'
 
 @Controller()
 export class AuthController {
   constructor (private authService: AuthService) {}
 
-  @UseGuards(LocalAuthRestGuard)
   @Post('login')
-  async login (@UserRest() user: User) {
-    return this.authService.issueToken(user)
+  async login (@Body() loginInput: LoginDto, @Ip() ip: string) {
+    const loginResults = await this.authService.login(loginInput, ip)
+
+    if (!loginResults) {
+      throw new UnauthorizedException(
+        'This email, password combination was not found'
+      )
+    }
+
+    return loginResults
   }
 
   @UseGuards(AuthRestGuard)

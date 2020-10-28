@@ -6,13 +6,25 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export class LoginInput {
+    account: string;
+    password: string;
+    countryCode?: string;
+}
+
 export class CreateCatInput {
     name?: string;
     age?: number;
 }
 
 export abstract class IQuery {
-    abstract login(account?: string, password?: string): Login | Promise<Login>;
+    abstract login(loginInput?: LoginInput): Login | Promise<Login>;
+
+    abstract accessToken(refreshToken?: string): Login | Promise<Login>;
+
+    abstract logout(refreshToken?: string): string | Promise<string>;
+
+    abstract logoutFromAll(): string | Promise<string>;
 
     abstract getCats(): Cat[] | Promise<Cat[]>;
 
@@ -21,6 +33,8 @@ export abstract class IQuery {
 
 export class Login {
     token?: string;
+    refreshToken?: string;
+    expiresIn?: number;
 }
 
 export abstract class IMutation {

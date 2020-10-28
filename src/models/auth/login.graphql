@@ -1,7 +1,0 @@
-type Query {
-  login(account: String, password: String): Login
-}
-
-type Login {
-  token: String
-}

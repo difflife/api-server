@@ -8,7 +8,11 @@ export default Joi.object({
   HOST: string.default('127.0.0.1'),
   PORT: number.default(3000),
   SESSION_SECRET_KEY: string.required(),
-  AUTH_SECRET_KEY: string.required(),
+
+  // jwt
+  JWT_SECRET_KEY: string.required(),
+  JWT_EXPIRES_IN: string.required(),
+  JWT_REFRESH_EXPIRES_IN: string.required(),
 
   // github配置验证
   GITHUB_CLIENT_ID: string.required(),
@@ -50,5 +54,5 @@ export default Joi.object({
   MYSQL_ENTITIES: string.empty('').default(''),
 
   // graphql
-  GRAPHQL_TYPEPATHS: string.empty('')
+  GQL_TYPEPATHS: string.empty('')
 })

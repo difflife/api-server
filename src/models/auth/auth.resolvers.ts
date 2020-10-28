@@ -1,34 +1,72 @@
-import { UseGuards, Request } from '@nestjs/common'
-import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql'
+import { UnauthorizedException, UseGuards, ExecutionContext } from '@nestjs/common'
+import { Args, Mutation, Query, Resolver, Subscription, Context, GqlExecutionContext } from '@nestjs/graphql'
 import { AuthService } from './auth.service'
-import { LocalAuthGqlGuard, UserGql } from '../../core'
-
-interface User {
-  password: string,
-  account: string,
-}
+import { Ip, Token } from '../../core'
+import { LoginDto } from './dto/login.dto'
+import { LoginRes } from './interfaces/login'
+import { AuthGqlGuard } from '../../core/guards'
+import { TokenService } from './token.service'
 
 @Resolver()
 export class AuthResolvers {
-  constructor (private readonly authService: AuthService) {}
+  constructor (
+    private readonly authService: AuthService,
+    private readonly tokenService: TokenService
+  ) {}
 
   @Query('login')
-  @UseGuards(LocalAuthGqlGuard)
   async login (
-    @Args('account') account: string,
-    @Args('password') password: string
+    @Args('loginInput') loginInput: LoginDto,
+    @Ip() ip: string
+  ): Promise<LoginRes> {
+    const loginResults: LoginRes = await this.authService.login(loginInput, ip)
+
+    if (!loginResults) {
+      throw new UnauthorizedException(
+        'This email, password combination was not found'
+      )
+    }
+
+    return loginResults
+  }
+
+  // 通过refreshToken换取新token
+  @Query('accessToken')
+  @UseGuards(AuthGqlGuard)
+  async accessToken (
+    @Args('refreshToken') refreshToken: string,
+    @Ip() ip: string,
+    @Token() token
   ) {
-    // GraphQL SDL
-    // query{
-    //   login(account: "小明", password: "123456") {
-    //     token
-    //   }
-    // }
-    // GraphQL variables
-    // {
-    //   "account": "小明",
-    //   "password": "123456"
-    // }
-    return this.authService.issueToken({ password, account })
+    const res: LoginRes = await this.tokenService.getAccessTokenFromRefreshToken(
+      refreshToken,
+      token,
+      ip
+    )
+
+    return res
+  }
+
+  @Query('logout')
+  @UseGuards(AuthGqlGuard)
+  async logout (
+    @Args('refreshToken') refreshToken: string,
+    @Token() token
+  ) {
+    await this.tokenService.deleteRefreshTokenForRefreshToken(token, refreshToken)
+    return '退出账号成功'
+  }
+
+  /**
+   * 通过使所有用户的刷新令牌失效，从所有设备注销用户
+   * @param userId The user id to logout
+   */
+  @Query('logoutFromAll')
+  @UseGuards(AuthGqlGuard)
+  async logoutFromAll (
+    @Token() token
+  ): Promise<any> {
+    await this.tokenService.deleteRefreshTokenForUser(token)
+    return '退出所有设备账号成功'
   }
 }
