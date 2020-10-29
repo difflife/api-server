@@ -18,7 +18,7 @@ import validationSchema from './config/env-schema'
       validationSchema
     }),
     TypeOrmModule.forRootAsync({
-      // imports: [ConfigModule],
+      // imports: [ConfigModule], // ConfigModule配置isGlobal为true所以不需要手动导入
       useFactory: (configService: ConfigService) => ({
         ...configService.get('database'),
         entities: [join(process.cwd(), 'dist', '**/*.entity{.ts,.js}')],
@@ -32,8 +32,7 @@ import validationSchema from './config/env-schema'
       inject: [ConfigService]
     }),
     GraphQLModule.forRootAsync({
-      // imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         ...configService.get('graphql'),
         context: ({ req, res }) => ({ req, res }),
         playground: process.env.NODE_ENV !== 'production'

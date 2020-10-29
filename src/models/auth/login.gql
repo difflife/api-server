@@ -7,6 +7,8 @@ type Query {
   logout(refreshToken: String): String
   "退出全部设备"
   logoutFromAll: String
+  "通过邮件验证身份，用于激活账号与重置密码"
+  validateFromMail: String
 }
 
 "登录输入参数"

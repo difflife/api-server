@@ -6,12 +6,14 @@ import { LoginDto } from './dto/login.dto'
 import { LoginRes } from './interfaces/login'
 import { AuthGqlGuard } from '../../core/guards'
 import { TokenService } from './token.service'
+import { EmailerService } from '../../shared/emailer/emailer.service'
 
 @Resolver()
 export class AuthResolvers {
   constructor (
     private readonly authService: AuthService,
-    private readonly tokenService: TokenService
+    private readonly tokenService: TokenService,
+    private readonly emailerService: EmailerService
   ) {}
 
   @Query('login')
@@ -26,7 +28,6 @@ export class AuthResolvers {
         'This email, password combination was not found'
       )
     }
-
     return loginResults
   }
 
@@ -43,7 +44,6 @@ export class AuthResolvers {
       token,
       ip
     )
-
     return res
   }
 
@@ -68,5 +68,15 @@ export class AuthResolvers {
   ): Promise<any> {
     await this.tokenService.deleteRefreshTokenForUser(token)
     return '退出所有设备账号成功'
+  }
+
+  @Query('validateFromMail')
+  async validateFromMail () {
+    const to = '243958407@qq.cm'
+    const token = 'token'
+    const username = '小明'
+    const a = await this.emailerService.sendActiveMail(to, token, username)
+    console.log(8111, a)
+    return '邮件发送成功，请查看邮箱'
   }
 }

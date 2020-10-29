@@ -10,6 +10,7 @@ import { AuthController } from './auth.controller'
 import { AuthResolvers } from './auth.resolvers'
 import { TokenService } from './token.service'
 import { RefreshToken } from './refresh-token.entity'
+import { SharedModule } from '../../shared/shared.module'
 
 @Module({
   imports: [
@@ -19,15 +20,13 @@ import { RefreshToken } from './refresh-token.entity'
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        ...configService.get('jwt'),
-        signOptions: {
-          expiresIn: configService.get('jwt').expiresIn
-        }
+        ...configService.get('jwt')
       }),
       inject: [ConfigService]
     }),
     TypeOrmModule.forFeature([RefreshToken]),
-    UsersModule
+    UsersModule,
+    SharedModule
   ],
   providers: [AuthService, TokenService, JwtStrategy, AuthResolvers],
   controllers: [AuthController]

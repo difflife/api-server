@@ -1,11 +1,15 @@
-import environmentConfig from './environment'
-import databaseConfig from './database'
-import graphqlConfig from './graphql'
-import jwtConfig from './jwt'
+import environment from './environment'
+import database from './database'
+import graphql from './graphql'
+import jwt from './jwt'
+import emailer from './emailer'
+import application from './application'
 
 export default [
-  environmentConfig,
-  graphqlConfig,
-  databaseConfig,
-  jwtConfig
+  environment,
+  graphql,
+  database,
+  jwt,
+  emailer,
+  application
 ]

@@ -4,11 +4,13 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { CoreModule, LoggerMiddleware } from './core'
 import { ModelsModule } from './models/models.module'
+import { SharedModule } from './shared/shared.module'
 
 @Module({
   imports: [
     CoreModule,
-    ModelsModule
+    ModelsModule,
+    SharedModule
   ],
   controllers: [AppController],
   providers: [

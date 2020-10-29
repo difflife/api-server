@@ -7,7 +7,7 @@ import * as RedisClient from 'ioredis'
 import * as expressSession from 'express-session'
 import * as connectRedis from 'connect-redis'
 // import * as csurf from 'csurf';
-// import * as ejsMate from 'ejs-mate';
+// import * as ejs from 'ejs';
 // import * as loaderConnect from 'loader-connect';
 // import * as flash from 'connect-flash';
 import { EnvironmentConfig, RedisConfig } from '../config'

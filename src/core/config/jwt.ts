@@ -8,7 +8,9 @@ export default registerAs('jwt', () => {
 
   return {
     secret,
-    expiresIn,
+    signOptions: {
+      expiresIn
+    },
     refreshExpiresIn
   }
 })

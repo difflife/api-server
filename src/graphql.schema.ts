@@ -26,6 +26,8 @@ export abstract class IQuery {
 
     abstract logoutFromAll(): string | Promise<string>;
 
+    abstract validateFromMail(): string | Promise<string>;
+
     abstract getCats(): Cat[] | Promise<Cat[]>;
 
     abstract cat(id: string): Cat | Promise<Cat>;
