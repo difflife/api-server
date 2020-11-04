@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { GraphQLModule } from '@nestjs/graphql'
+import { RedisModule } from 'nestjs-redis'
 import { join } from 'path'
 
 import loadConfig from './config/load-config'
@@ -37,6 +38,10 @@ import validationSchema from './config/env-schema'
         context: ({ req, res }) => ({ req, res }),
         playground: process.env.NODE_ENV !== 'production'
       }),
+      inject: [ConfigService]
+    }),
+    RedisModule.forRootAsync({
+      useFactory: (configService: ConfigService) => configService.get('redis'),
       inject: [ConfigService]
     })
   ]

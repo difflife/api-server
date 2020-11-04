@@ -10,8 +10,8 @@ import { isNil, isEmpty, findIndex, contains, forEach, map } from 'ramda'
 import { JwtPayload } from './interfaces/jwt-payload'
 import { LoginRes } from './interfaces/login'
 import { RefreshToken } from './refresh-token.entity'
-import { UsersExpired } from './interfaces/users-expired'
-import { Token } from 'src/core'
+import { UserWhitelist } from './interfaces/user-whitelist'
+import { CacheService } from '../../shared/cache/cache.service'
 
 @Injectable()
 export class TokenService {
@@ -19,22 +19,35 @@ export class TokenService {
   private readonly expiresIn: number
   private readonly refreshExpiresIn: number
 
-  /**
-   * todo
-   * 应该放在redis缓存中
-   */
-  private usersExpired: UsersExpired = {};
-
   constructor (
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     @InjectRepository(RefreshToken)
-    private readonly refreshToken: Repository<RefreshToken>
+    private readonly refreshToken: Repository<RefreshToken>,
+    private readonly cacheService: CacheService
   ) {
     const defaultJwtOption = this.configService.get('jwt')
     this.expiresIn = defaultJwtOption.expiresIn
     this.refreshExpiresIn = defaultJwtOption.refreshExpiresIn
     this.secret = defaultJwtOption.secret
+  }
+
+  /**
+   * 获取用户白名单
+   * 实质保存的是有效token的id
+   */
+  async getUserWhitelist (): Promise<UserWhitelist> {
+    const userWhitelist = (await this.cacheService.get('USER_WHITELIST')) as unknown as UserWhitelist || {}
+    return userWhitelist
+  }
+
+  /**
+   * 设置用户白名单
+   * @param data
+   */
+  async setUserWhitelist (data: UserWhitelist) {
+    const a = await this.cacheService.set('USER_WHITELIST', data)
+    console.log(a)
   }
 
   /**
@@ -140,16 +153,18 @@ export class TokenService {
    */
   private async addTokenToWhiteListed (userId: string, token: string) {
     if (userId) {
-      // 当前过期用户
-      const userExpiredCurrent: string[] = this.usersExpired[userId]
+      // 当前用户
+      const userWhitelist = await this.getUserWhitelist()
+      const currentUser: string[] = userWhitelist[userId]
       const payload: JwtPayload = await this.getPayloadFormToken(token)
       const { jti } = payload
 
-      if (isNil(userExpiredCurrent)) {
-        this.usersExpired[userId] = [jti]
+      if (isNil(currentUser)) {
+        userWhitelist[userId] = [jti]
       } else {
-        this.usersExpired[userId].push(jti)
+        userWhitelist[userId].push(jti)
       }
+      this.setUserWhitelist(userWhitelist)
     } else {
       console.log('token保存白名单失败')
     }
@@ -160,13 +175,15 @@ export class TokenService {
     const payload: JwtPayload = await this.getPayloadFormToken(token)
     const { jti, sub: userId } = payload
 
-    // 当前过期用户
-    const userExpiredCurrent: string[] = this.usersExpired[userId]
+    // 当前用户
+    const userWhitelist = await this.getUserWhitelist()
+    const currentUser: string[] = userWhitelist[userId]
 
-    if (!isNil(userExpiredCurrent) && !isEmpty(userExpiredCurrent)) {
-      const index = findIndex((item) => item === jti, userExpiredCurrent)
+    if (!isNil(currentUser) && !isEmpty(currentUser)) {
+      const index = findIndex((item) => item === jti, currentUser)
       if (index >= 0) {
-        this.usersExpired[userId].splice(index, 1)
+        userWhitelist[userId].splice(index, 1)
+        this.setUserWhitelist(userWhitelist)
       }
     } else {
       // 正常流程不会出现白名单为空的情况，不然通过不了AuthGqlGuard守卫在前面就会抛错没有权限
@@ -178,12 +195,14 @@ export class TokenService {
    * 通过用户名删除白名单中的所有token，让所有token失效所有设备都必须重新登录
    * @param userId
    */
-  private deleteTokenAllFromWhiteListed (userId: string) {
-    // 当前过期用户
-    const userExpiredCurrent: string[] = this.usersExpired[userId]
+  private async deleteTokenAllFromWhiteListed (userId: string) {
+    // 当前用户
+    const userWhitelist = await this.getUserWhitelist()
+    const currentUser: string[] = userWhitelist[userId]
 
-    if (!isNil(userExpiredCurrent) && !isEmpty(userExpiredCurrent)) {
-      this.usersExpired[userId] = []
+    if (!isNil(currentUser) && !isEmpty(currentUser)) {
+      userWhitelist[userId] = []
+      this.setUserWhitelist(userWhitelist)
     } else {
       // 正常流程不会出现白名单为空的情况，不然通过不了AuthGqlGuard守卫在前面就会抛错没有权限
       console.log('该用户白名单为空')
@@ -192,14 +211,12 @@ export class TokenService {
 
   private async isWhiteListed (payload: JwtPayload): Promise<boolean> {
     const { sub, jti } = payload
-    // 当前过期用户
-    const userExpiredCurrent: string[] = this.usersExpired[sub]
+    // 当前用户
+    const userWhitelist = await this.getUserWhitelist()
+    const currentUser: string[] = userWhitelist[sub]
 
-    if (!isNil(userExpiredCurrent) && !isEmpty(userExpiredCurrent)) {
-      // 将所有的token都解码为payload然后进行比较
-      // const payloads: JwtPayload[] = await Promise.all(map(async (token) => this.getPayloadFormToken(token), userExpiredCurrent))
-
-      return contains(jti, userExpiredCurrent)
+    if (!isNil(currentUser) && !isEmpty(currentUser)) {
+      return contains(jti, currentUser)
     }
     return false
   }

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { MailerModule } from '@nestjs-modules/mailer'
 
 import { EmailerService } from './emailer/emailer.service'
+import { CacheService } from './cache/cache.service'
 
 @Module({
   imports: [
@@ -13,8 +14,8 @@ import { EmailerService } from './emailer/emailer.service'
       inject: [ConfigService]
     })
   ],
-  providers: [EmailerService],
-  exports: [EmailerService]
+  providers: [EmailerService, CacheService],
+  exports: [EmailerService, CacheService]
 })
 
 export class SharedModule {}

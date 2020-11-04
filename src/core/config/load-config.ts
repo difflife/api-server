@@ -4,6 +4,7 @@ import graphql from './graphql'
 import jwt from './jwt'
 import emailer from './emailer'
 import application from './application'
+import redis from './redis'
 
 export default [
   environment,
@@ -11,5 +12,6 @@ export default [
   database,
   jwt,
   emailer,
-  application
+  application,
+  redis
 ]
