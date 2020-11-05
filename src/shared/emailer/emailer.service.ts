@@ -17,6 +17,27 @@ export class EmailerService {
   }
 
   /**
+   * 发送注册验证码
+   * @param to 激活人邮箱
+   * @param code 验证码
+   * @param username 名字
+   */
+  async sendRegisterMail (to: string, code: string) {
+    const name = this.name
+    const subject = `${name}帐号注册`
+    const html = `<p>您好：<b>${to}</b></p>
+          <p>我们收到您在<b>${name}</b>的注册请求，输入验证码 <span style="color: blue">${code}</span> 完成注册：</p>
+          <p>若您没有在<b>${name}</b>填写过注册信息，说明有人滥用了您的电子邮箱，请删除此邮件，我们对给您造成的打扰感到抱歉。</p>
+          <p><b>${name}</b> 谨上。</p>`
+    return await this.mailerService.sendMail({
+      from: this.from, // 发件人
+      to, // 收件人
+      subject, // 主题
+      html // 内容
+    })
+  }
+
+  /**
    * 激活邮件
    * @param to 激活人邮箱
    * @param token token
@@ -30,14 +51,13 @@ export class EmailerService {
           <a href="${this.host}/active_account?key=${token}&name=${username}">激活链接</a>
           <p>若您没有在<b>${name}</b>填写过注册信息，说明有人滥用了您的电子邮箱，请删除此邮件，我们对给您造成的打扰感到抱歉。</p>
           <p><b>${name}</b> 谨上。</p>`
-    const sendRes = await this.mailerService.sendMail({
+    return await this.mailerService.sendMail({
       from: this.from, // 发件人
       to, // 收件人
       subject, // 主题
       html, // 内容
       text: '你是什么'
     })
-    return sendRes
   }
 
   /**
@@ -46,7 +66,7 @@ export class EmailerService {
    * @param token token
    * @param username 名字
    */
-  sendResetPassMail (to: string, token: string, username: string) {
+  async sendResetPassMail (to: string, token: string, username: string) {
     const name = this.name
     const subject = `${name}密码重置`
     const html = `<p>您好：${username}</p>
@@ -54,7 +74,7 @@ export class EmailerService {
           <a href="${this.host}/reset_pass?key=${token}&name=${username}">重置密码链接</a>
           <p>若您没有在${name}填写过注册信息，说明有人滥用了您的电子邮箱，请删除此邮件，我们对给您造成的打扰感到抱歉。</p>
           <p>${name} 谨上。</p>`
-    return this.mailerService.sendMail({
+    return await this.mailerService.sendMail({
       from: this.from,
       to,
       subject,

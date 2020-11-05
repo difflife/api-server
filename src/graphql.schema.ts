@@ -6,8 +6,27 @@
 
 /* tslint:disable */
 /* eslint-disable */
+export enum CodeType {
+    REGISTER = "REGISTER",
+    LOGIN = "LOGIN",
+    RESET = "RESET"
+}
+
 export class LoginInput {
     account: string;
+    password: string;
+    countryCode?: string;
+}
+
+export class SendValidateFromMailInput {
+    imgCode: string;
+    email: string;
+    type?: CodeType;
+}
+
+export class RegisterInput {
+    phoneNumber?: string;
+    email?: string;
     password: string;
     countryCode?: string;
 }
@@ -20,13 +39,15 @@ export class CreateCatInput {
 export abstract class IQuery {
     abstract login(loginInput?: LoginInput): Login | Promise<Login>;
 
-    abstract accessToken(refreshToken?: string): Login | Promise<Login>;
+    abstract accessToken(refreshTokenInput?: string): Login | Promise<Login>;
 
-    abstract logout(refreshToken?: string): string | Promise<string>;
+    abstract logout(refreshTokenInput?: string): string | Promise<string>;
 
     abstract logoutFromAll(): string | Promise<string>;
 
-    abstract validateFromMail(): string | Promise<string>;
+    abstract sendValidateFromMail(sendValidateFromMailInput?: SendValidateFromMailInput): string | Promise<string>;
+
+    abstract register(registerInput?: RegisterInput): string | Promise<string>;
 
     abstract getCats(): Cat[] | Promise<Cat[]>;
 

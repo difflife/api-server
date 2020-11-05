@@ -1,3 +1,9 @@
+import { fromPairs, compose, split, map, prop } from 'ramda'
+import { UnauthorizedException } from '@nestjs/common'
+import { Request } from 'express'
+import { create, createMathExpr } from 'svg-captcha'
+import { emailRegex, phoneRegex, usernameCnRegex, passwordRegex } from './regex'
+
 /**
  * 应用于rest请求，通过cookie验证身份
  * jwt.strategy.ts
@@ -6,11 +12,6 @@
  *  cookieExtractor
  * ]}
  */
-import { fromPairs, compose, split, map, prop } from 'ramda'
-import { UnauthorizedException } from '@nestjs/common'
-import { Request } from 'express'
-import { emailRegex, phoneRegex, usernameCnRegex, passwordRegex } from './regex'
-
 export const cookieExtractor = (req: Request): string => {
   try {
     const cookie = req.headers.cookie
@@ -49,4 +50,32 @@ export const validatePhone = (phone_number: string): boolean => {
 
 export const validatePassword = (password: string): boolean => {
   return passwordRegex.test(password)
+}
+
+export const getCaptcha = (size?: number, width?: number, height?: number) => {
+  const captcha = create({
+    size: size || 4,
+    fontSize: 50,
+    width: width || 100,
+    height: height || 34,
+    color: true, // 验证码的字符是否有颜色，默认没有，如果设定了背景，则默认有
+    background: '#cc9966', // 验证码图片背景颜色
+    noise: 4 // 干扰线条的数量
+  })
+
+  return captcha
+}
+
+export const getCaptchaMath = (size?: number, width?: number, height?: number) => {
+  const captcha = createMathExpr({
+    size: size || 4,
+    fontSize: 50,
+    width: width || 100,
+    height: height || 34,
+    color: true, // 验证码的字符是否有颜色，默认没有，如果设定了背景，则默认有
+    background: '#cc9966', // 验证码图片背景颜色
+    noise: 4 // 干扰线条的数量
+  })
+
+  return captcha
 }

@@ -1,0 +1,65 @@
+type Query {
+  "登录"
+  login(loginInput: LoginInput): Login
+  "通过refresh_token换取access_token"
+  accessToken(refreshTokenInput: String): Login
+  "退出登录"
+  logout(refreshTokenInput: String): String
+  "退出全部设备"
+  logoutFromAll: String
+  "通过邮件验证身份，用于激活账号与重置密码"
+  sendValidateFromMail(sendValidateFromMailInput: SendValidateFromMailInput): String
+  "账号注册"
+  register(registerInput: RegisterInput): String
+}
+
+"登录输入参数"
+input LoginInput {
+  "账号"
+  account: String!
+  "密码"
+  password: String!
+  "国家"
+  countryCode: String
+}
+
+"登录返回参数"
+type Login {
+  "令牌"
+  token: String
+  "当token过期时通过refreshToken换取新的token"
+  refreshToken: String
+  "过期时间"
+  expiresIn: Int
+}
+
+enum CodeType {
+  "注册"
+  REGISTER
+  "当密码输入超过3次之后需要需要输入验证码"
+  LOGIN
+  "重置密码"
+  RESET
+}
+
+"通过邮箱发送验证码"
+input SendValidateFromMailInput {
+  "图片验证码"
+  imgCode: String!
+  "邮箱"
+  email: String!
+  "邮箱"
+  type: CodeType
+}
+
+"账号注册"
+input RegisterInput {
+  "手机"
+  phoneNumber: String
+  "邮箱"
+  email: String
+  "密码"
+  password: String!
+  "国家"
+  countryCode: String
+}
