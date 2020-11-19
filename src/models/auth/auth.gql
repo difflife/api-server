@@ -8,7 +8,10 @@ type Query {
   "退出全部设备"
   logoutFromAll: String
   "通过邮件验证身份，用于激活账号与重置密码"
-  sendValidateFromMail(sendValidateFromMailInput: SendValidateFromMailInput): String
+  sendValidate(sendValidateInput: SendValidateInput): String
+}
+
+type Mutation {
   "账号注册"
   register(registerInput: RegisterInput): String
 }
@@ -34,22 +37,22 @@ type Login {
 }
 
 enum CodeType {
-  "注册"
-  REGISTER
-  "当密码输入超过3次之后需要需要输入验证码"
-  LOGIN
-  "重置密码"
-  RESET
+  "手机"
+  phone
+  "邮箱"
+  email
 }
 
 "通过邮箱发送验证码"
-input SendValidateFromMailInput {
+input SendValidateInput {
   "图片验证码"
   imgCode: String!
   "邮箱"
-  email: String!
-  "邮箱"
-  type: CodeType
+  email: String
+  "手机"
+  phoneNumber: String
+  "验证码发送类型"
+  type: CodeType!
 }
 
 "账号注册"
@@ -62,4 +65,8 @@ input RegisterInput {
   password: String!
   "国家"
   countryCode: String
+  "验证码"
+  code: String!
+  "验证码发送类型"
+  type: CodeType!
 }

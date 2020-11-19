@@ -12,6 +12,7 @@ import { LoginRes } from './interfaces/login'
 import { RefreshToken } from './refresh-token.entity'
 import { UserWhitelist } from './interfaces/user-whitelist'
 import { CacheService } from '../../shared/cache/cache.service'
+import { userWhitelist } from '../../constants/redis'
 
 @Injectable()
 export class TokenService {
@@ -37,8 +38,7 @@ export class TokenService {
    * 实质保存的是有效token的id
    */
   async getUserWhitelist (): Promise<UserWhitelist> {
-    const userWhitelist = (await this.cacheService.get('USER_WHITELIST')) as unknown as UserWhitelist || {}
-    return userWhitelist
+    return (await this.cacheService.get(userWhitelist)) as unknown as UserWhitelist || {}
   }
 
   /**
@@ -46,8 +46,7 @@ export class TokenService {
    * @param data
    */
   async setUserWhitelist (data: UserWhitelist) {
-    const a = await this.cacheService.set('USER_WHITELIST', data)
-    console.log(a)
+    await this.cacheService.set(userWhitelist, data)
   }
 
   /**
@@ -164,7 +163,7 @@ export class TokenService {
       } else {
         userWhitelist[userId].push(jti)
       }
-      this.setUserWhitelist(userWhitelist)
+      await this.setUserWhitelist(userWhitelist)
     } else {
       console.log('token保存白名单失败')
     }
@@ -183,7 +182,7 @@ export class TokenService {
       const index = findIndex((item) => item === jti, currentUser)
       if (index >= 0) {
         userWhitelist[userId].splice(index, 1)
-        this.setUserWhitelist(userWhitelist)
+        await this.setUserWhitelist(userWhitelist)
       }
     } else {
       // 正常流程不会出现白名单为空的情况，不然通过不了AuthGqlGuard守卫在前面就会抛错没有权限
@@ -202,7 +201,7 @@ export class TokenService {
 
     if (!isNil(currentUser) && !isEmpty(currentUser)) {
       userWhitelist[userId] = []
-      this.setUserWhitelist(userWhitelist)
+      await this.setUserWhitelist(userWhitelist)
     } else {
       // 正常流程不会出现白名单为空的情况，不然通过不了AuthGqlGuard守卫在前面就会抛错没有权限
       console.log('该用户白名单为空')

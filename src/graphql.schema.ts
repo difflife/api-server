@@ -7,9 +7,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export enum CodeType {
-    REGISTER = "REGISTER",
-    LOGIN = "LOGIN",
-    RESET = "RESET"
+    phone = "phone",
+    email = "email"
 }
 
 export class LoginInput {
@@ -18,10 +17,11 @@ export class LoginInput {
     countryCode?: string;
 }
 
-export class SendValidateFromMailInput {
+export class SendValidateInput {
     imgCode: string;
-    email: string;
-    type?: CodeType;
+    email?: string;
+    phoneNumber?: string;
+    type: CodeType;
 }
 
 export class RegisterInput {
@@ -29,6 +29,8 @@ export class RegisterInput {
     email?: string;
     password: string;
     countryCode?: string;
+    code: string;
+    type: CodeType;
 }
 
 export class CreateCatInput {
@@ -45,23 +47,23 @@ export abstract class IQuery {
 
     abstract logoutFromAll(): string | Promise<string>;
 
-    abstract sendValidateFromMail(sendValidateFromMailInput?: SendValidateFromMailInput): string | Promise<string>;
-
-    abstract register(registerInput?: RegisterInput): string | Promise<string>;
+    abstract sendValidate(sendValidateInput?: SendValidateInput): string | Promise<string>;
 
     abstract getCats(): Cat[] | Promise<Cat[]>;
 
     abstract cat(id: string): Cat | Promise<Cat>;
 }
 
+export abstract class IMutation {
+    abstract register(registerInput?: RegisterInput): string | Promise<string>;
+
+    abstract createCat(createCatInput?: CreateCatInput): Cat | Promise<Cat>;
+}
+
 export class Login {
     token?: string;
     refreshToken?: string;
     expiresIn?: number;
-}
-
-export abstract class IMutation {
-    abstract createCat(createCatInput?: CreateCatInput): Cat | Promise<Cat>;
 }
 
 export abstract class ISubscription {

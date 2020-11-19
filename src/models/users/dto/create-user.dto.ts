@@ -4,11 +4,6 @@ export class CreateUserDto {
   @IsString()
   @Min(9)
   @Max(16)
-  account: string;
-
-  @IsString()
-  @Min(9)
-  @Max(16)
   password: string;
 
   @IsEmail()

@@ -5,18 +5,16 @@ export class User {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ comment: '手机号' })
+  @Column({ comment: '手机号', nullable: true, unique: true })
   phone_number: string;
 
-  @Column({ comment: '手机号' })
+  @Column({ comment: '邮箱', nullable: true, unique: true })
   email: string;
 
-  @Column({ comment: '手机号' })
+  @Column({ comment: '用户名', nullable: true, unique: true })
   username: string;
 
   @Column({
-    nullable: true,
-    unique: true,
     comment: '密码'
   })
   password: string;

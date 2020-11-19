@@ -1,5 +1,7 @@
 import { UnauthorizedException, UseGuards, ExecutionContext } from '@nestjs/common'
 import { Args, Mutation, Query, Resolver, Subscription, Context, GqlExecutionContext } from '@nestjs/graphql'
+import { differenceInMinutes } from 'date-fns'
+import { dissoc, prop } from 'ramda'
 import { AuthService } from './auth.service'
 import { Ip, Token } from '../../core'
 import { LoginDto } from './dto/login.dto'
@@ -7,9 +9,11 @@ import { LoginRes } from './interfaces/login'
 import { AuthGqlGuard } from '../../core/guards'
 import { TokenService } from './token.service'
 import { EmailerService } from '../../shared/emailer/emailer.service'
-import { SendValidateFromMailDto } from './dto/send-validate-form-email.dto'
 import { CacheService } from '../../shared/cache/cache.service'
-import { getCaptcha } from '../../common'
+import { SendValidateDto } from './dto/send-validate.dto'
+import { RegisterDto } from './dto/register.dto'
+import { CodeType as CodeTypeGql } from '../../graphql.schema'
+import { CodeType } from '../../constants/redis'
 
 @Resolver()
 export class AuthResolvers {
@@ -39,12 +43,12 @@ export class AuthResolvers {
   @Query('accessToken')
   @UseGuards(AuthGqlGuard)
   async accessToken (
-    @Args('refreshToken') refreshToken: string,
+    @Args('refreshTokenInput') refreshTokenInput: string,
     @Ip() ip: string,
     @Token() token
   ) {
     const res: LoginRes = await this.tokenService.getAccessTokenFromRefreshToken(
-      refreshToken,
+      refreshTokenInput,
       token,
       ip
     )
@@ -54,10 +58,10 @@ export class AuthResolvers {
   @Query('logout')
   @UseGuards(AuthGqlGuard)
   async logout (
-    @Args('refreshToken') refreshToken: string,
+    @Args('refreshTokenInput') refreshTokenInput: string,
     @Token() token
   ) {
-    await this.tokenService.deleteRefreshTokenForRefreshToken(token, refreshToken)
+    await this.tokenService.deleteRefreshTokenForRefreshToken(token, refreshTokenInput)
     return '退出账号成功'
   }
 
@@ -76,32 +80,78 @@ export class AuthResolvers {
 
   /**
    * 通过邮箱发送验证码
-   * @param sendValidateFromMail
+   * @param sendValidate
    * @param ip
    */
-  @Query('sendValidateFromMail')
-  async validateFromMail (
-    @Args('sendValidateFromMailInput') sendValidateFromMail: SendValidateFromMailDto,
+  @Query('sendValidate')
+  async sendValidate (
+    @Args('sendValidateInput') sendValidate: SendValidateDto,
     @Ip() ip: string
   ) {
-    const { email: to, imgCode: code, type } = sendValidateFromMail
-    const imgCode = await this.cacheService.get('imgCode')
+    const { email, imgCode, type, phoneNumber } = sendValidate
+    const account = type === CodeTypeGql.email ? email : phoneNumber
+    const codeType = type === CodeTypeGql.email ? CodeType.email : CodeType.phone
 
-    // 验证图片验证码
-    if (imgCode) {
-      if (imgCode !== code) {
-        throw new UnauthorizedException('验证码过期')
-      }
+    await this.authService.validateCode({
+      code: imgCode,
+      account,
+      codeType: CodeType.img,
+      noMes: '请获取图片验证码'
+    })
+
+    const codeData = await this.authService.getCurrentCode(account, codeType)
+    let total = prop('total', codeData) || 0
+    const timestamp = prop('timestamp', codeData)
+
+    if (timestamp && differenceInMinutes(new Date().getTime(), timestamp) < 1) throw new Error('发送太频繁请稍候再试')
+    if (total > 10) throw new Error('已超过当然发送量，请明天再试')
+
+    // 生成新的随机验证码
+    const code = await this.authService.cacheCode(codeType, account, ++total)
+
+    // 缓存到redis并通过邮箱发送
+    if (type === CodeTypeGql.email) {
+      await this.emailerService.sendRegisterMail(email, code)
     } else {
-      throw new UnauthorizedException('请先获取验证码')
+      console.warn('暂未处理phone')
+      return
     }
 
-    // 生成新的随机二维码，缓存到redis并通过邮箱发送
-    const { text } = getCaptcha()
-    const codeLowerCase = text.toLowerCase()
-    await this.cacheService.set('emailCode', codeLowerCase, 1000 * 60 * 10) // 十分钟内有效
-    await this.emailerService.sendRegisterMail(to, codeLowerCase)
+    // imgCode使用过之后需要删除，防止再次使用
+    const catchMap = await this.cacheService.get(CodeType.img)
+    await this.cacheService.set(CodeType.img, dissoc(account, catchMap))
 
     return '邮件已发送，请注意查收'
+  }
+
+  @Mutation('register')
+  async register (
+    @Args('registerInput') registerInput: RegisterDto,
+    @Ip() ip: string
+  ) {
+    const { code, email, type, phoneNumber } = registerInput
+    const account = type === CodeTypeGql.email ? email : phoneNumber
+
+    if (type === CodeTypeGql.email) {
+      await this.authService.validateCode({
+        code,
+        account: email,
+        codeType: CodeType.email
+      })
+    } else {
+      console.log('暂未处理phone', phoneNumber)
+      return
+    }
+
+    try {
+      await this.authService.register(registerInput)
+      return '注册成功'
+    } catch (e) {
+      throw new Error(e)
+    } finally {
+    // 注册完成之后删除验证码
+      const catchMap = await this.cacheService.get(CodeType.email)
+      await this.cacheService.set(CodeType.email, dissoc(account, catchMap))
+    }
   }
 }
