@@ -6,13 +6,6 @@ export class RegisterDto extends RegisterInput {
   @IsNotEmpty()
   type: CodeType;
 
-  @IsString({ message: '邮箱必须为字符串' })
-  @Length(3, 24, { message: '邮箱长度必须为3-24' })
-  @Transform(value => value.trim(), { toClassOnly: true })
-  email: string;
-
-  phoneNumber: string;
-
   @IsNotEmpty()
   @IsString({ message: '密码必须为字符串' })
   @Length(6, 16, { message: '密码长度必须为6-16，分别包含大小写、数字和字母' })
@@ -24,4 +17,12 @@ export class RegisterDto extends RegisterInput {
   @Length(4, 4, { message: '验证码长度必须为4' })
   @Transform(value => value.trim(), { toClassOnly: true })
   code: string;
+
+  // @IsString({ message: '邮箱必须为字符串' })
+  // @Length(3, 24, { message: '邮箱长度必须为3-24' })
+  // @Transform(value => value.trim(), { toClassOnly: true })
+  email?: string;
+
+  @IsString()
+  phoneNumber?: string;
 }

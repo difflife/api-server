@@ -107,13 +107,12 @@ export class AuthService {
 
     const codeData: string | AccountCode = await this.getCurrentCode(account, codeType)
 
-    // undefault 表示未获取验证码
+    // 表示未获取验证码
     if (!codeData) throw new BadRequestException(noMes)
 
     if (codeType === CodeType.img) {
       cacheCode = codeData as string
 
-      // 图片验证码暂不设置最大获取次数
       if (!cacheCode) throw new BadRequestException(noMes)
       if (cacheCode !== code) throw new BadRequestException(errMes)
     } else {
@@ -143,7 +142,7 @@ export class AuthService {
   async cacheCode (codeType: CodeType, account: string, total: number): Promise<string> {
     const code = await this.createCode(codeType)
 
-    const codeMap: CacheCode = await this.cacheService.get(codeType)
+    const codeMap: CacheCode = await this.cacheService.get(codeType) || {}
     codeMap[account] = {
       code,
       total,

@@ -5,6 +5,7 @@ import jwt from './jwt'
 import emailer from './emailer'
 import application from './application'
 import redis from './redis'
+import alicloudsms from './alicloudsms'
 
 export default [
   environment,
@@ -13,5 +14,6 @@ export default [
   jwt,
   emailer,
   application,
-  redis
+  redis,
+  alicloudsms
 ]

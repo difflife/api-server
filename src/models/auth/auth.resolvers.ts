@@ -1,5 +1,5 @@
-import { UnauthorizedException, UseGuards, ExecutionContext } from '@nestjs/common'
-import { Args, Mutation, Query, Resolver, Subscription, Context, GqlExecutionContext } from '@nestjs/graphql'
+import { UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql'
 import { differenceInMinutes } from 'date-fns'
 import { dissoc, prop } from 'ramda'
 import { AuthService } from './auth.service'
@@ -14,6 +14,7 @@ import { SendValidateDto } from './dto/send-validate.dto'
 import { RegisterDto } from './dto/register.dto'
 import { CodeType as CodeTypeGql } from '../../graphql.schema'
 import { CodeType } from '../../constants/redis'
+import { AlicloudSmsService } from '../../shared/alicloudsms/alicloudsms.service'
 
 @Resolver()
 export class AuthResolvers {
@@ -21,7 +22,8 @@ export class AuthResolvers {
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
     private readonly emailerService: EmailerService,
-    private readonly cacheService: CacheService
+    private readonly cacheService: CacheService,
+    private readonly alicloudSmsService: AlicloudSmsService
   ) {}
 
   @Query('login')
@@ -103,8 +105,8 @@ export class AuthResolvers {
     let total = prop('total', codeData) || 0
     const timestamp = prop('timestamp', codeData)
 
-    if (timestamp && differenceInMinutes(new Date().getTime(), timestamp) < 1) throw new Error('发送太频繁请稍候再试')
-    if (total > 10) throw new Error('已超过当然发送量，请明天再试')
+    if (timestamp && differenceInMinutes(new Date().getTime(), timestamp) < 1) throw new Error('获取验证码过于频繁，请稍候再试')
+    if (total > 10) throw new Error('短信已超当日发送量，请明天再试')
 
     // 生成新的随机验证码
     const code = await this.authService.cacheCode(codeType, account, ++total)
@@ -113,8 +115,12 @@ export class AuthResolvers {
     if (type === CodeTypeGql.email) {
       await this.emailerService.sendRegisterMail(email, code)
     } else {
-      console.warn('暂未处理phone')
-      return
+      await this.alicloudSmsService.sendSms({
+        TemplateCode: 'SMS_20560619',
+        PhoneNumbers: phoneNumber,
+        TemplateParam: { code },
+        SignName: '野菠萝'
+      })
     }
 
     // imgCode使用过之后需要删除，防止再次使用
@@ -131,17 +137,13 @@ export class AuthResolvers {
   ) {
     const { code, email, type, phoneNumber } = registerInput
     const account = type === CodeTypeGql.email ? email : phoneNumber
+    const codeType = type === CodeTypeGql.email ? CodeType.email : CodeType.phone
 
-    if (type === CodeTypeGql.email) {
-      await this.authService.validateCode({
-        code,
-        account: email,
-        codeType: CodeType.email
-      })
-    } else {
-      console.log('暂未处理phone', phoneNumber)
-      return
-    }
+    await this.authService.validateCode({
+      code,
+      account,
+      codeType
+    })
 
     try {
       await this.authService.register(registerInput)
@@ -149,9 +151,9 @@ export class AuthResolvers {
     } catch (e) {
       throw new Error(e)
     } finally {
-    // 注册完成之后删除验证码
-      const catchMap = await this.cacheService.get(CodeType.email)
-      await this.cacheService.set(CodeType.email, dissoc(account, catchMap))
+      // 注册完成之后删除验证码
+      // const catchMap = await this.cacheService.get(CodeType.email)
+      // await this.cacheService.set(CodeType.email, dissoc(account, catchMap))
     }
   }
 }

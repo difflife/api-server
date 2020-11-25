@@ -27,6 +27,7 @@
     "typings": "cross-env ts-node generate-typings"
   },
   "dependencies": {
+    "@alicloud/pop-core": "^1.7.10",
     "@nestjs-modules/mailer": "^1.5.1",
     "@nestjs/common": "^7.4.4",
     "@nestjs/config": "^0.5.0",

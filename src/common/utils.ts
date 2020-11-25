@@ -79,3 +79,28 @@ export const getCaptchaMath = (size?: number, width?: number, height?: number) =
 
   return captcha
 }
+
+function getRandom (min, max) {
+  return Math.round(Math.random() * (max - min) + min)
+}
+/**
+ * 生成数字、大小写字母的随机字符串
+ */
+export const mixedRandomStr = (length = 6) => {
+  let code = ''
+  for (let i = 0; i < length; i++) {
+    const type = getRandom(1, 3)
+    switch (type) {
+      case 1:
+        code += String.fromCharCode(getRandom(48, 57))// 数字
+        break
+      case 2:
+        code += String.fromCharCode(getRandom(65, 90))// 大写字母
+        break
+      case 3:
+        code += String.fromCharCode(getRandom(97, 122))// 小写字母
+        break
+    }
+  }
+  return code
+}
