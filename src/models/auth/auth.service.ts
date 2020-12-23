@@ -6,12 +6,12 @@ import { User } from '../users/user.entity'
 import { TokenService } from './token.service'
 import { LoginRes, Login } from './interfaces/login'
 import { LoginDto } from './dto/login.dto'
-import { validatePhone, validateEmail, validateUsername, validatePassword } from '../../common/utils'
 import { CacheService } from '../../shared/cache/cache.service'
 import { getCaptcha } from '../../common'
 import { RegisterDto } from './dto/register.dto'
 import { CodeType } from '../../constants/redis'
 import { ValidateCode, CacheCode, AccountCode } from './interfaces/code'
+import { AccountType } from 'src/graphql.schema'
 
 @Injectable()
 export class AuthService {
@@ -22,12 +22,8 @@ export class AuthService {
   ) {}
 
   async login (loginInput: LoginDto, ip: string) {
-    const login = this.validateAccount(loginInput)
+    const login = this.transformUser(loginInput)
     const loginResults: User = await this.usersService.login(login)
-
-    if (!loginResults) {
-      return null
-    }
 
     const payload: JwtPayload = {
       sub: loginResults.id
@@ -48,41 +44,24 @@ export class AuthService {
   }
 
   /**
-   * 验证账号
-   * 暂时没做手机号国际化验证
-   * @param loginInput
-   */
-  validateAccount (loginInput: LoginDto): Login {
-    const { account, password } = loginInput
-    const login: Login = this.transformAccount(account)
-
-    if (validatePassword(password)) {
-      login.password = password
-    } else {
-      throw new BadRequestException('密码不合法')
-    }
-
-    return login
-  }
-
-  /**
-   * 转换账号，将账号转换为 email、phone、username 模式
+   * 转换用户信息
    * @param account
    */
-  transformAccount (account: string): Login {
-    const login: Login = {}
+  transformUser (user): Login {
+    const { type, email, phoneNumber, countryCode, ...rest } = user
 
-    if (validateEmail(account)) {
-      login.email = account
-    } else if (validatePhone(account)) {
-      login.phone_number = account
-    } else if (validateUsername(account)) {
-      login.username = account
-    } else {
-      throw new BadRequestException('账号不合法')
+    if (type === AccountType.email) {
+      return {
+        ...rest,
+        email
+      }
     }
 
-    return login
+    return {
+      ...rest,
+      phone_number: phoneNumber,
+      country_code: countryCode
+    }
   }
 
   async getUserIdFromToken (token: string) {

@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { JwtService, JwtSignOptions } from '@nestjs/jwt'
 import { Repository } from 'typeorm'
 import { InjectRepository } from '@nestjs/typeorm'
-import { addSeconds } from 'date-fns'
+import { addMilliseconds } from 'date-fns'
 import { randomBytes } from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 import { isNil, isEmpty, findIndex, contains, forEach, map } from 'ramda'
@@ -28,7 +28,7 @@ export class TokenService {
     private readonly cacheService: CacheService
   ) {
     const defaultJwtOption = this.configService.get('jwt')
-    this.expiresIn = defaultJwtOption.expiresIn
+    this.expiresIn = defaultJwtOption.signOptions.expiresIn
     this.refreshExpiresIn = defaultJwtOption.refreshExpiresIn
     this.secret = defaultJwtOption.secret
   }
@@ -89,7 +89,7 @@ export class TokenService {
     refreshToken.userId = userId
     // refreshToken.clientId = clientId
     refreshToken.ipAddress = ipAddress
-    refreshToken.expiresAt = addSeconds(new Date(), this.refreshExpiresIn)
+    refreshToken.expiresAt = addMilliseconds(new Date(), this.refreshExpiresIn)
     refreshToken.value = token
 
     await this.refreshToken.save(refreshToken)
@@ -208,6 +208,10 @@ export class TokenService {
     }
   }
 
+  /**
+   * 当前用户是否存在于白名单中
+   * @param payload
+   */
   private async isWhiteListed (payload: JwtPayload): Promise<boolean> {
     const { sub, jti } = payload
     // 当前用户

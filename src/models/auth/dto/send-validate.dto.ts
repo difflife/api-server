@@ -1,6 +1,6 @@
 import { IsString, Length, IsNotEmpty, IsEnum } from 'class-validator'
 import { Transform } from 'class-transformer'
-import { SendValidateInput, CodeType } from '../../../graphql.schema'
+import { SendValidateInput, AccountType } from '../../../graphql.schema'
 
 export class SendValidateDto extends SendValidateInput {
   @IsNotEmpty()
@@ -17,6 +17,6 @@ export class SendValidateDto extends SendValidateInput {
   @IsString()
   phoneNumber?: string;
 
-  @IsEnum(CodeType)
-  type: CodeType;
+  @IsEnum(AccountType)
+  type: AccountType;
 }

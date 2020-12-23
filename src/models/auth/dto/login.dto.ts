@@ -1,13 +1,24 @@
-import { IsString, Min, Max, IsEmail, Matches, MaxLength, MinLength, Length, IsPhoneNumber, IsMobilePhone, IsNotEmpty } from 'class-validator'
+import { IsString, IsEmail, Length, IsNotEmpty, IsEnum } from 'class-validator'
 import { Transform } from 'class-transformer'
-import { LoginInput } from '../../../graphql.schema'
+import { LoginInput, AccountType, CountryCode } from '../../../graphql.schema'
+import { IsValidAccount } from '../../../core/decorators/validator.decorators'
 
 export class LoginDto extends LoginInput {
-  @IsNotEmpty()
   @IsString({ message: '账号必须为字符串' })
-  @Length(3, 24, { message: '邮箱长度必须为3-24，用户名长度必须为3-16' })
-  @Transform(value => value.trim(), { toClassOnly: true })
-  account: string;
+  @IsEmail()
+  @Transform(value => value?.trim(), { toClassOnly: true })
+  email?: string;
+
+  @IsString({ message: '手机号必须为字符串' })
+  @Transform(value => value?.trim(), { toClassOnly: true })
+  phoneNumber?: string;
+
+  @IsEnum(CountryCode)
+  countryCode?: CountryCode;
+
+  @IsEnum(AccountType)
+  @IsValidAccount()
+  type: AccountType;
 
   @IsNotEmpty()
   @IsString({ message: '密码必须为字符串' })

@@ -5,10 +5,7 @@ export class RefreshToken {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({
-    nullable: true,
-    unique: true
-  })
+  @Column({ nullable: true, unique: true })
   value: string;
 
   @Column()

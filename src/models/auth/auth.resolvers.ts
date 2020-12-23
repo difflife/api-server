@@ -12,7 +12,7 @@ import { EmailerService } from '../../shared/emailer/emailer.service'
 import { CacheService } from '../../shared/cache/cache.service'
 import { SendValidateDto } from './dto/send-validate.dto'
 import { RegisterDto } from './dto/register.dto'
-import { CodeType as CodeTypeGql } from '../../graphql.schema'
+import { AccountType } from '../../graphql.schema'
 import { CodeType } from '../../constants/redis'
 import { AlicloudSmsService } from '../../shared/alicloudsms/alicloudsms.service'
 
@@ -34,9 +34,7 @@ export class AuthResolvers {
     const loginResults: LoginRes = await this.authService.login(loginInput, ip)
 
     if (!loginResults) {
-      throw new UnauthorizedException(
-        'This email, password combination was not found'
-      )
+      throw new UnauthorizedException('账号或密码错误')
     }
     return loginResults
   }
@@ -91,8 +89,8 @@ export class AuthResolvers {
     @Ip() ip: string
   ) {
     const { email, imgCode, type, phoneNumber } = sendValidate
-    const account = type === CodeTypeGql.email ? email : phoneNumber
-    const codeType = type === CodeTypeGql.email ? CodeType.email : CodeType.phone
+    const account = type === AccountType.email ? email : phoneNumber
+    const codeType = type === AccountType.email ? CodeType.email : CodeType.phone
 
     await this.authService.validateCode({
       code: imgCode,
@@ -112,7 +110,7 @@ export class AuthResolvers {
     const code = await this.authService.cacheCode(codeType, account, ++total)
 
     // 缓存到redis并通过邮箱发送
-    if (type === CodeTypeGql.email) {
+    if (type === AccountType.email) {
       await this.emailerService.sendRegisterMail(email, code)
     } else {
       await this.alicloudSmsService.sendSms({
@@ -136,8 +134,8 @@ export class AuthResolvers {
     @Ip() ip: string
   ) {
     const { code, email, type, phoneNumber } = registerInput
-    const account = type === CodeTypeGql.email ? email : phoneNumber
-    const codeType = type === CodeTypeGql.email ? CodeType.email : CodeType.phone
+    const account = type === AccountType.email ? email : phoneNumber
+    const codeType = type === AccountType.email ? CodeType.email : CodeType.phone
 
     await this.authService.validateCode({
       code,

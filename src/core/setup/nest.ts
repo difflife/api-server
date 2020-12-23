@@ -20,8 +20,8 @@ export default (app: INestApplication) => {
         return new BadRequestException(message)
       },
       whitelist: true, // 如果设置为true，验证器将去掉没有使用任何验证装饰器的属性的验证（返回的）对象
-      forbidNonWhitelisted: true, // 如果设置为true，验证器不会去掉非白名单的属性，而是会抛出异常
-      skipMissingProperties: false, // 如果设置为true，验证将跳过对所有验证对象中没有的属性的验证
+      forbidNonWhitelisted: false, // 如果设置为true，验证器不会去掉非白名单的属性，而是会抛出异常
+      skipMissingProperties: true, // 如果设置为true，验证将跳过对所有验证对象中没有的属性的验证
       forbidUnknownValues: true, // 如果设置为true，尝试验证未知对象会立即失败
       dismissDefaultMessages: false, // 如果设置为true，将不会使用默认消息验证，如果不设置，错误消息会始终是undefined
       validationError: {
