@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core'
-import { HttpServer } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import * as internalIp from 'internal-ip'
+
 import { AppModule } from './app.module'
 import { EnvironmentConfig } from './core/config'
-
 import setupApp from './core/setup'
 
 declare const module: any
@@ -28,16 +28,11 @@ async function bootstrap () {
     module.hot.dispose(() => app.close())
   }
 
-  // if (process.env.NODE_ENV === 'development') {
-  //   const address = app.getHttpServer().listen().address()
-  //   let baseUrl = app.getHttpServer().address().address
-  //   if (baseUrl === '0.0.0.0' || baseUrl === '::') {
-  //     baseUrl = 'localhost'
-  //   }
-
-  //   console.log(`Listening to http://${baseUrl}:${port}`)
-  //   console.log(`Playground UI: http://${baseUrl}:${port}/graphql`)
-  // }
+  if (process.env.NODE_ENV === 'development') {
+    const ip = await internalIp.v4()
+    console.log(`Listening to http://${ip}:${port}`)
+    console.log(`Playground UI: http://${ip}:${port}/graphql`)
+  }
 }
 
 bootstrap().catch(console.error)
