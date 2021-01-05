@@ -1,10 +1,10 @@
 import * as Joi from 'joi'
 
 const string = Joi.string()
-const number = Joi.string()
+const number = Joi.number()
 
 export default Joi.object({
-  NODE_ENV: string.valid(['development', 'production', 'test']).default('development'),
+  NODE_ENV: string.valid('development', 'production', 'test').default('development'),
   HOST: string.default('127.0.0.1'),
   PORT: number.default(3000),
   SESSION_SECRET_KEY: string.required(),

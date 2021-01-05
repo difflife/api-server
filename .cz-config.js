@@ -31,19 +31,19 @@ module.exports = {
     },
     {
       value: 'build',
-      name: '🏗  修改项目构建系统(例如 glup， webpack， rollup，npm的配置等.xxx) 的提交',
+      name: '🏗  对构建系统或者外部依赖项进行了修改(例如 glup， webpack， rollup，npm的配置等)',
     },
     {
       value: 'ci',
-      name: '🔧 修改项目继续集成流程(例如 Travis， Jenkins， GitLab CI， Circle等) 的提交',
+      name: '🔧 对CI配置文件或脚本进行了修改(例如 Travis， Jenkins， GitLab CI， Circle等)',
     },
     {
       value: 'chore',
-      name: '🗯  构建过程或辅助工具以及库（如文档生成）的更改',
+      name: '🗯  改变构建流程或者增加依赖库、工具等',
     },
     {
       value: 'revert',
-      name: '⏪ 回滚某个更早之前的提交',
+      name: '⏪ 回滚版本',
     },
     // {
     //   value: 'merge',
